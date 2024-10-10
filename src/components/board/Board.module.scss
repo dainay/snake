@@ -1,13 +1,16 @@
 .board {
-    background-color: white;
-    width: 500px;
-    height: 500px;
+    background-color: rgba(60, 34, 34, 0.683);
+   
+    height: 61vh;
+    aspect-ratio: 3.02/1.8;
+    // min-height: 505px;
     position: fixed;
-    top: 0;
+    top: 0.5vh;
     left: 0;
-    right: 0;
+    right: -6vw;
     bottom: 0;
     margin: auto;
+    
 }
 
 .score {
@@ -18,3 +21,4 @@
     padding: 10px;
     color: white;
 }
+

@@ -235,20 +235,24 @@ useEffect(() => {
 
     return (
 
-
-        <div className={s.board}> 
-        <span className={s.score}> Score : {score}</span>
-        <Snake data={snakeData}></Snake>
-      {  gameOver && <GameOver replay={replay}></GameOver> }
-        
-        {
-            foodData.map((food) => {
-                // console.log('Food DDDDDDDDDDDDDD:', food);
-                return <Food key={food.id} coordonates={food}></Food>
-            })
-        }
-     
-        </div>
+<div className={s.back}>
+    
+            <div className={s.board}>
+            {/* <img src="/back.jpg" alt="" /> */}
+    
+            <span className={s.score}> Score : {score}</span>
+            <Snake data={snakeData}></Snake>
+          {  gameOver && <GameOver replay={replay}></GameOver> }
+    
+            {
+                foodData.map((food) => {
+                    // console.log('Food DDDDDDDDDDDDDD:', food);
+                    return <Food key={food.id} coordonates={food}></Food>
+                })
+            }
+    
+            </div>
+</div>
     )
  };
 
