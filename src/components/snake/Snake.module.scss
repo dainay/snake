@@ -1,8 +1,16 @@
 .snakeDot {
-    background-color: black;
+    // background-color: black;
     position: absolute;
-    width: 10px;
-    height: 10px;
-    border: 1px solid white;
+    width: 25px;
+    height: 25px;
     z-index: 2;
+    // border: rgb(10, 63, 156) solid thin;
+    transition: all 0.3s ease;
+    
+   
+    svg {
+        // border: red solid thin;
+        transform: rotate(90deg);
+    }
+    
 }

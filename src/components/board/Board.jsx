@@ -1,260 +1,299 @@
- import s from './Board.module.scss';
- import Snake from '../snake/Snake';
- import { useEffect, useState, useRef } from 'react';
- import gsap from 'gsap';
- import Food from '../food/Food';
-import { generateRandomCoordinates } from '../../utils/utils';
-import GameOver from '../gameOver/GameOver';
-  
+import s from "./Board.module.scss";
+import Snake from "../snake/Snake";
+import { useEffect, useState, useRef } from "react";
+import gsap from "gsap";
+import Item from "../item/Item";
+import { generateRandomCoordinates } from "../../utils/utils";
+import { reversedControls } from "../../utils/utils";
+import { defaultControls } from "../../utils/utils";
+import GameOver from "../gameOver/GameOver";
+import useStore from "../../utils/store";
+import { flashUser } from '../../utils/utils';
+import { runStudents } from '../../utils/utils';
 
 const Board = () => {
+  // console.log('Board component');
 
-// console.log('Board component');
+  const deplace = 25; // the difference between the head and the next element of the snake
 
-const [snakeData, setSnakeData] = useState([
-    [0, 0],
-    [10, 0]
+  const { mode: storeMode, removeMode, addMode } = useStore();
 
-]);   
+  const [snakeData, setSnakeData] = useState([
+    [0, 0]
+  ]);
 
-const [foodData, setFoodData] = useState([]);
- 
-const timer = useRef(0);
-const foodTimer = useRef(0);
-const direction = useRef('RIGHT');
-const cantChangeDirection = useRef(true);
-const [gameOver, setGameOver] = useState(false);
-const [speed, setSpeed] = useState(0.4);
-const [score, setScore] = useState(0);
-// console.log('Direction:', direction);
+  const [foodData, setFoodData] = useState([]);
+  const [trapData, setTrapData] = useState([]);
 
 
-const gameIsOver = () => {
-    console.log('GAME OVER');
-    gsap.ticker.remove(gameLoop); //to fix all updating images
+  const timer = useRef(0);
+  const foodTimer = useRef(0);
+  const trapTimer = useRef(0);
+  const direction = useRef("RIGHT");
+  const cantChangeDirection = useRef(true);
+  const [gameOver, setGameOver] = useState(false);
+  const [speed, setSpeed] = useState(0.4);
+  const [score, setScore] = useState(0);
+
+  const [segmentRotations, setSegmentRotations] = useState([0]);
+  // console.log('Direction:', direction);
+
+  const { mode } = useStore();
+
+  useEffect(() => {
+    if (mode.includes("impossible")) {
+      setSpeed(0.02);
+    }
+  }, [mode]);
+
+  const rotationMap = {
+    UP: 270,
+    DOWN: 90,
+    LEFT: 180,
+    RIGHT: 0,
+  };
+  const [rotation, setRotation] = useState(rotationMap["RIGHT"]);
+
+  const gameIsOver = () => {
+    console.log("GAME OVER");
+    gsap.ticker.remove(gameLoop); // Stop the game loop
     setGameOver(true);
-}
+  };
+  
 
-const replay = () => {
+  const replay = () => {
     setGameOver(false);
     setSnakeData([
-        [0, 0],
-        [10, 0]
+      [0, 0]
     ]);
     setFoodData([]);
-    direction.current = 'RIGHT';
+    setTrapData([]);
+    setSegmentRotations([0]);
+    direction.current = "RIGHT";
     timer.current = 0;
     foodTimer.current = 0;
+    trapTimer.current = 0;
     setSpeed(0.4);
     setScore(0);
+    removeMode("impossible");
+    removeMode("corner");
+  };
 
- }
-
-const hasEatenFood = () => { 
+  const hasEatenItem = ({ getter, setter, type, newSnakeData, newSegmentRotations }) => {
     const head = snakeData[snakeData.length - 1];
-    //compare to whole existed food.
-
-    const match = foodData.find((_food) => head[0] === _food.x && head[1] === _food.y); //to find the food that the snake ate
-   
+  
+    const match = getter.find(
+      (_item) => head[0] === _item.x && head[1] === _item.y
+    );
+  
     if (match) {
-        const newFoodData = foodData.filter((_food) => _food !== match);
-        setFoodData(newFoodData);
-
+      const newItemData = getter.filter((_item) => _item !== match);
+      setter(newItemData);
+  
+      if (type === "food") {
         if (speed > 0.05) {
-            setSpeed(speed - 0.04);
+          setSpeed(speed - 0.01);
         }
-         
-        return true;
-    } else {
-        return false;
-    }
-}
+        return "food";
+      }
+  
+      if (type === "trap") {
+        console.log(newSnakeData, "newSnakeData before effect")
+        const effects = [flashUser, () => runStudents(newSnakeData, newSegmentRotations)];
+        
+        // const selectedEffect = effects[Math.floor(Math.random() * effects.length)];
+        const selectedEffect = effects[1];
+        selectedEffect(); // Apply the selected effect
 
-const snakeCollapsed = () => {
+        console.log(newSnakeData, "newSnakeData before effect")
+
+        return { newSnakeData, newSegmentRotations };
+      }
+    }
+  
+    return false;
+  };
+  
+  
+  const snakeCollapsed = () => {
     let head = snakeData[snakeData.length - 1];
-    let snake =[...snakeData];//create copy of the snake
+    let snake = [...snakeData]; //create copy of the snake
 
     snake.pop(); //remove the head of the snake to not compare head with itself
 
     for (let i = 0; i < snake.length; i++) {
-        if (head[0] === snake[i][0] && head[1] === snake[i][1]) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-const moveSnake = () => { 
-    let newSnakeData = [...snakeData]; //for clone the table to work with later
-let head = newSnakeData[newSnakeData.length - 1]; //get the head of the snake
-
-
-    switch (direction.current) {
-    
-        case "UP":
-            head = [head[0], head[1] - 10];
-            break;
-       
-            case "DOWN":
-            head = [head[0], head[1] + 10];
-                
-            break;
-
-        case "LEFT":
-            head = [head[0] - 10, head[1]];            
-            break; 
-
-        case "RIGHT":
-            head = [head[0] + 10, head[1]];         
-            break;
-    
-        default:
-            break;
-    }
-
-    newSnakeData.push(head); //add the new head to the snake
-    newSnakeData.shift(); //remove the first element of the array
-
-const isDead = isOutOfBoard();
-console.log('Is dead:', isDead);
-const snakeAteItself = snakeCollapsed();
-
-if (isDead || snakeAteItself) { 
-    gameIsOver();
-} else {
-
-    const snakeAteFood = hasEatenFood(); 
-    console.log('Snake ate food:', snakeAteFood);
-   
-    if (snakeAteFood) {
-        newSnakeData.unshift([ ]);//add an element at the beginning of the table
-
-        setScore((prev) => prev + 10); //update the score
-    }
-
-    setSnakeData (newSnakeData); //update the state with the new snake data
-   
-}
-
-}
-
-
-
-const isOutOfBoard = () => { 
-    const head = snakeData[snakeData.length - 1];
-    if (head[0] < 0 || head[0] >= 500 || head[1] < 0 || head[1] >= 500) {
+      if (head[0] === snake[i][0] && head[1] === snake[i][1]) {
         return true;
+      }
     }
 
     return false;
-}
+  };
 
+  const moveSnake = () => {
+    let newSnakeData = [...snakeData];
+    let newSegmentRotations = [...segmentRotations];
+    let head = newSnakeData[newSnakeData.length - 1];
+    let headRotation = rotation;
+  
+    switch (direction.current) {
+      case "UP":
+        head = [head[0], head[1] - deplace];
+        headRotation = rotationMap["UP"];
+        break;
+      case "DOWN":
+        head = [head[0], head[1] + deplace];
+        headRotation = rotationMap["DOWN"];
+        break;
+      case "LEFT":
+        head = [head[0] - deplace, head[1]];
+        headRotation = rotationMap["LEFT"];
+        break;
+      case "RIGHT":
+        head = [head[0] + deplace, head[1]];
+        headRotation = rotationMap["RIGHT"];
+        break;
+      default:
+        break;
+    }
+  
+    newSnakeData.push(head);
+    newSegmentRotations.push(headRotation);
+  
+    // Check if the snake eats food or hits a trap
+    const eatenFood = hasEatenItem({ getter: foodData, setter: setFoodData, type: "food", newSnakeData, newSegmentRotations });
 
-const onKeyDown = (e) => {
+    const hitTrap = hasEatenItem({ getter: trapData, setter: setTrapData, type: "trap", newSnakeData, newSegmentRotations });
+  
+    if (eatenFood) {
+      // Update score if food was eaten
+      setScore((prev) => prev + 10);
+      console.log('Food eaten, updating score kkkkkkkkkkkkk');
+    } else if (hitTrap) {
 
+      newSnakeData.shift();
+      newSegmentRotations.shift();
+
+      console.log('GENERAL HIT TRAP WITH NO EFFECT');
+    } else {
+      // If nothing was eaten, remove the tail
+      console.log('Nothing was eaten, removing tail kkkkkkkkk');
+      newSnakeData.shift();
+      newSegmentRotations.shift();
+    }
+  
+    setSnakeData(newSnakeData);
+    setSegmentRotations(newSegmentRotations);
+
+    if (isOutOfBoard() || snakeCollapsed()) {
+      gameIsOver();
+    }
+  };
+  
+  const isOutOfBoard = () => {
+    const head = snakeData[snakeData.length - 1];
+    if ((head[0] < 0 || head[0] >= 850) || (head[1] < 0 || head[1] >= 525)) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const onKeyDown = (e) => {
     if (cantChangeDirection.current === false) return; //to make change directlon only when it was updated visually
 
     cantChangeDirection.current = false;
 
-
-switch (e.keyCode) {
-    case 38:
-        console.log('UP');
-        if (direction.current !== 'DOWN') {
-        direction.current = 'UP';}
-        break;
-    case 40:
-        console.log('DOWN');
-        if (direction.current !== 'UP') {
-        direction.current = 'DOWN';}
-        break;
-    case 37:
-        console.log('LEFT');
-        if (direction.current !== 'RIGHT') {
-        direction.current = 'LEFT';
+  
+    if (mode.includes("reversed")) {
+      reversedControls(e, direction);
+    } else {
+      defaultControls(e, direction);
     }
-        break;
-    case 39:
-        console.log('RIGHT');
-        if (direction.current !== 'LEFT') {
-        direction.current = 'RIGHT';
-        }
-        break;
-    default:
-        break;
-}}
 
-const addFood = () => {
+  };
+
+  const addItem = ({getter, setter}) => {
     // console.log('ADD FOOD');
-    generateRandomCoordinates();
-    let food = generateRandomCoordinates();
-    console.log('Food:', food);
-    setFoodData((prev) => [...prev, food]);
-    
-    console.log('Food data:', foodData);
+    // generateRandomCoordinates(mode);
 
-}
+    let coordinates = generateRandomCoordinates(mode);
+    // console.log('Food:', food);
+    setter((prev) => [...prev, coordinates]);
 
-const gameLoop = (time, deltaTime, frame) => {
-    // console.log("Game loop", time, deltaTime, frame);
-timer.current += deltaTime * 0.001;
-foodTimer.current += deltaTime * 0.001;
+    // console.log('Food data:', foodData);
+  };
 
-    if (timer.current > speed) {
-        //  console.log('MOVE SNAKE');
-        timer.current = 0;
-        moveSnake();
-        cantChangeDirection.current = true;
+  const gameLoop = (time, deltaTime, frame) => {
+    if (gameOver) {
+      gsap.ticker.remove(gameLoop); // Stop the game loop if game is over
+      return;
     }
-
-    if (foodTimer.current > 3 && foodData.length < 15) {
-        // console.log('CREATE FOOD');
-        foodTimer.current = 0;
-        
-        addFood();
+  
+    timer.current += deltaTime * 0.001;
+    foodTimer.current += deltaTime * 0.001;
+    trapTimer.current += deltaTime * 0.001;
+  
+    if (timer.current > (mode.includes("impossible") ? 0.04 : speed)) {
+      timer.current = 0;
+      moveSnake();
+      cantChangeDirection.current = true;
     }
+  
+    if (foodTimer.current > 1 && foodData.length < 20) {
+      foodTimer.current = 0;
+      addItem({ getter: foodData, setter: setFoodData });
+    }
+  
+    if (trapTimer.current > 2 && trapData.length < 15) {
+      trapTimer.current = 0;
+      addItem({ getter: trapData, setter: setTrapData });
+    }
+  };
+  
 
-
-}
-
-
-useEffect(() => {
+  useEffect(() => {
     window.addEventListener("keydown", onKeyDown);
-     
+
     gsap.ticker.add(gameLoop);
 
     return () => {
-        window.removeEventListener("keydown", onKeyDown);
-        gsap.ticker.remove(gameLoop);
-    }
+      window.removeEventListener("keydown", onKeyDown);
+      gsap.ticker.remove(gameLoop);
+    };
   }, [snakeData]);
 
+  return (
+    <>
+      <div className={s.back}>
+        <div className={s.board}>
+          {/* <img src="/back.jpg" alt="" /> */}
 
+          <span className={s.score}> Score : {score}</span>
+          <Snake data={snakeData} segmentRotations={segmentRotations}></Snake>
+          {foodData.map((food) => {
+            // console.log('Food DDDDDDDDDDDDDD:', food);
+            return <Item key={food.id} coordonates={food} type='food'></Item>;
+          })}
 
-    return (
+          {trapData.map((trap) => {
+            // console.log('Food DDDDDDDDDDDDDD:',    trap);
+            return <Item key={trap.id} coordonates={trap} type='trap'></Item>;
+          })}
 
-<div className={s.back}>
-    
-            <div className={s.board}>
-            {/* <img src="/back.jpg" alt="" /> */}
-    
-            <span className={s.score}> Score : {score}</span>
-            <Snake data={snakeData}></Snake>
-          {  gameOver && <GameOver replay={replay}></GameOver> }
-    
-            {
-                foodData.map((food) => {
-                    // console.log('Food DDDDDDDDDDDDDD:', food);
-                    return <Food key={food.id} coordonates={food}></Food>
-                })
-            }
-    
-            </div>
-</div>
-    )
- };
+        </div>
+      </div>
 
+      <div className={s.mapWrapper}>
+          <div className={`${s.map} ${s['map-left']}`}>
+          <img src=" /map-left.jpg" alt="" /></div>
+          <div className={`${s.map} ${s['map-right']}`}>
+          <img src=" /map-right.jpg" alt="" /></div>
+      </div>
+
+      {gameOver && <GameOver replay={replay}></GameOver>}
+    </>
+  );
+};
 
 export default Board;

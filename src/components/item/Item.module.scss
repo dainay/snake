@@ -1,0 +1,15 @@
+.item {
+    width: 25px;
+    height: 25px;
+    // background-color: red;
+    position: absolute;
+    // border: 1px solid white;
+
+    &_trap {
+        background-color: rgb(204, 31, 161);
+    }
+
+    &_food {
+        background-color: green;
+    }
+}

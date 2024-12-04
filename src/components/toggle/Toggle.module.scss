@@ -1,0 +1,36 @@
+.toggle {
+    font-size: 2rem;
+    background-color: white;
+}
+
+.wrapper {
+    background-color: white;
+    display: flex;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.mode {
+
+}
+
+.toggle {
+    background-color: #31beac;
+    width: 40px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    border-radius: 40px;
+}
+
+.switch {
+    background-color: #61386b;
+    height: 18px;
+    width: 18px;
+    border-radius: 50%;
+    transition: all 0.3s linear;
+
+    &_active {
+        transform: translateX(120%);
+    }
+}
