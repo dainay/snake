@@ -240,7 +240,7 @@ const Board = () => {
       cantChangeDirection.current = true;
     }
   
-    if (foodTimer.current > 1 && foodData.length < 20) {
+    if (foodTimer.current > 0.1 && foodData.length < 100) {
       foodTimer.current = 0;
       addItem({ getter: foodData, setter: setFoodData });
     }
@@ -263,6 +263,21 @@ const Board = () => {
     };
   }, [snakeData]);
 
+  const walls = [
+    { x: 125, y: 150 }, { x: 125, y: 175 }, { x: 125, y: 200 }, { x: 125, y: 225 }, { x: 125, y: 250 },
+    { x: 125, y: 275 }, { x: 125, y: 300 }, { x: 125, y: 325 }, { x: 125, y: 350 }, { x: 125, y: 375 },
+    { x: 125, y: 400 }, { x: 125, y: 425 }, { x: 125, y: 450 }, { x: 150, y: 150 }, { x: 175, y: 150 },
+    { x: 200, y: 150 }, { x: 225, y: 150 }, { x: 250, y: 150 }, { x: 275, y: 150 }, { x: 300, y: 150 },
+    { x: 275, y: 150 }, { x: 525, y: 150 }, { x: 525, y: 175 }, { x: 525, y: 200 }, { x: 525, y: 225 },
+    { x: 525, y: 250 }, { x: 525, y: 275 }, { x: 525, y: 300 },
+    { x: 550, y: 300 }, { x: 575, y: 300 }, { x: 600, y: 300 }, { x: 625, y: 300 }, { x: 650, y: 300 },
+    { x: 675, y: 300 }, { x: 700, y: 300 }, { x: 725, y: 300 }, { x: 750, y: 300 }, { x: 775, y: 300 },
+    { x: 800, y: 300 }, { x: 825, y: 300 },
+    { x: 575, y: 325 }, { x: 575, y: 350 }, { x: 575, y: 375 }, { x: 575, y: 400 }, { x: 575, y: 425 },
+    { x: 375, y: 500 }, { x: 375, y: 475 }, { x: 375, y: 450 }, { x: 375, y: 425 } 
+  ];
+  
+
   return (
     <>
       <div className={s.back}>
@@ -281,7 +296,11 @@ const Board = () => {
             return <Item key={trap.id} coordonates={trap} type='trap'></Item>;
           })}
 
+
+          {walls.map((wall, index) => { return ( <div key={index} className={s.wall} style={{ transform: `translate(${wall.x}px, ${wall.y}px)` }}></div> ); })}
         </div>
+
+       
       </div>
 
       <div className={s.mapWrapper}>

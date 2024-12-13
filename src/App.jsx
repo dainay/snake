@@ -25,22 +25,13 @@ function App() {
       <div className={s.back}></div>
       <Board></Board>
 
-      {/* <section className="container">
-      <div {...getRootProps({className: 'dropzone'})}>
-        <input {...getInputProps()} />
-        <p>Drag 'n' drop some files here, or click to select files</p>
-      </div>
-      <aside>
-        <h4>Files</h4>
-        <ul>{files}</ul>
-      </aside>
-    </section> */}
-   
       <div className="toggle-wrapper">   
-        <Toggle mode={"corner"}></Toggle>
-        <Toggle mode={"impossible"}></Toggle>
-        <Toggle mode={"reversed"}></Toggle>
-        </div>
+      <Toggle mode={"corner"}></Toggle>
+      <Toggle mode={"impossible"}></Toggle>
+      <Toggle mode={"reversed"}></Toggle>
+      </div>
+
+      <div className="subs" > Hey watch out !</div>
     </div>
   );
 }

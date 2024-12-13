@@ -70,3 +70,12 @@
     overflow: hidden;
 }
 
+.wall {
+    background-color: rgb(115, 16, 161);
+    width: 25px;
+    height: 25px;
+    opacity: 0.8;
+    position: absolute;
+    border: blue solid thin ;
+}
+
