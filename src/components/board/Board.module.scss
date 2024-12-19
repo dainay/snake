@@ -1,5 +1,5 @@
 .board {
-    background-color: rgba(60, 34, 34, 0.683);
+    // background-color: rgba(60, 34, 34, 0.683);
     min-width: 850px;
     width: 850px;
     max-width: 850px;
@@ -17,7 +17,8 @@
 }
 
 .back {
-    filter: drop-shadow(0 0 0.75rem rgba(34, 34, 34, 0.822));
+    -webkit-filter: drop-shadow(0 0 0.75rem rgba(34, 34, 34, 0.822));
+            filter: drop-shadow(0 0 0.75rem rgba(34, 34, 34, 0.822));
     background-size: cover;
    width: 1100px;
    height: 810px;
@@ -31,51 +32,18 @@
 
 .score {
     position: absolute;
-    top: -40px;
-    right: 0;
+    top: -90px;
+    right: 380px;
     font-size: 24px;
-    padding: 10px;
-    color: white;
+     color: rgb(24, 24, 24);
+    font-family: "Mr Dafoe", serif;
+    font-weight: 400;
+    width: 100px;
+    text-align: center;
+ 
 }
 
-.map {
-    height: 100vh;
-    width: 320px;
-    position: absolute;
-    top: 0;
 
-    img {
-        width: 100%;
-        overflow: hidden;
-    }
 
-    filter: drop-shadow(0 0 0.75rem rgba(20, 20, 20, 0.822));
-    overflow: hidden;
-
-}
-
-.map-left  {
-    left: -17%;
-    transform: rotate(-4deg);
-}
-
-.map-right {
- right: -17%;
- transform: rotate(4deg);
-}
-
-.mapWrapper {
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-}
-
-.wall {
-    background-color: rgb(115, 16, 161);
-    width: 25px;
-    height: 25px;
-    opacity: 0.8;
-    position: absolute;
-    border: blue solid thin ;
-}
+ 
 

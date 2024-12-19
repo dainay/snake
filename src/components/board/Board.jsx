@@ -10,6 +10,9 @@ import GameOver from "../gameOver/GameOver";
 import useStore from "../../utils/store";
 import { flashUser } from '../../utils/utils';
 import { runStudents } from '../../utils/utils';
+import useGameStore from "../walls/Walls";
+import Win from "../win/Win";
+
 
 const Board = () => {
   // console.log('Board component');
@@ -32,12 +35,25 @@ const Board = () => {
   const direction = useRef("RIGHT");
   const cantChangeDirection = useRef(true);
   const [gameOver, setGameOver] = useState(false);
-  const [speed, setSpeed] = useState(0.4);
-  const [score, setScore] = useState(0);
+  const [speed, setSpeed] = useState(0.7);
+  const [score, setScore] = useState(1);
+  const [hasWon, setHasWon] = useState(false);
+  const walls = useGameStore.getState().walls; // Get the walls from the Zustand store
+
 
   const [segmentRotations, setSegmentRotations] = useState([0]);
   // console.log('Direction:', direction);
 
+  const wallAudio = [
+    "/audio/wall1.mp3",
+    "/audio/wall2.mp3"
+  ];
+ 
+  
+  const eatAudio = [
+    "/audio/push.mp3",
+    "/audio/blind.mp3"
+  ];
   const { mode } = useStore();
 
   useEffect(() => {
@@ -63,6 +79,7 @@ const Board = () => {
 
   const replay = () => {
     setGameOver(false);
+    setHasWon(false);
     setSnakeData([
       [0, 0]
     ]);
@@ -73,8 +90,8 @@ const Board = () => {
     timer.current = 0;
     foodTimer.current = 0;
     trapTimer.current = 0;
-    setSpeed(0.4);
-    setScore(0);
+    setSpeed(0.7);
+    setScore(1);
     removeMode("impossible");
     removeMode("corner");
   };
@@ -101,8 +118,12 @@ const Board = () => {
         console.log(newSnakeData, "newSnakeData before effect")
         const effects = [flashUser, () => runStudents(newSnakeData, newSegmentRotations)];
         
-        // const selectedEffect = effects[Math.floor(Math.random() * effects.length)];
-        const selectedEffect = effects[1];
+        const selectedEffect = effects[Math.floor(Math.random() * effects.length)];
+
+        if (selectedEffect === effects[1]  && snakeData.length > 2) { // Check if the selected effect is runStudents
+          setScore((prev) => prev - 2);
+        }
+      
         selectedEffect(); // Apply the selected effect
 
         console.log(newSnakeData, "newSnakeData before effect")
@@ -129,6 +150,21 @@ const Board = () => {
 
     return false;
   };
+
+
+
+  const snakeHitsWall = () => {
+    let head = snakeData[snakeData.length - 1]; // Get the snake's head 
+    
+    for (let i = 0; i < walls.length; i++) {
+      if (head[0] === walls[i].x && head[1] === walls[i].y) {
+        return true; // Collision detected
+      }
+    }
+  
+    return false; // No collision
+  };
+  
 
   const moveSnake = () => {
     let newSnakeData = [...snakeData];
@@ -167,8 +203,9 @@ const Board = () => {
   
     if (eatenFood) {
       // Update score if food was eaten
-      setScore((prev) => prev + 10);
+      setScore((prev) => prev + 1);
       console.log('Food eaten, updating score kkkkkkkkkkkkk');
+
     } else if (hitTrap) {
 
       newSnakeData.shift();
@@ -181,13 +218,30 @@ const Board = () => {
       newSnakeData.shift();
       newSegmentRotations.shift();
     }
-  
+
+   if (score >= 35) {
+      winGame();
+      return; // Exit the function to stop further logic
+    }
     setSnakeData(newSnakeData);
     setSegmentRotations(newSegmentRotations);
 
-    if (isOutOfBoard() || snakeCollapsed()) {
+    if (isOutOfBoard() || snakeHitsWall(newSnakeData, walls)) {
+      const wallAudioFile = wallAudio[Math.floor(Math.random() * wallAudio.length)];
+      const audio = new Audio(wallAudioFile); // Use the selected file path
+      audio.currentTime = 0;
+      audio.play();
       gameIsOver();
     }
+    
+    if (snakeCollapsed()) {
+      const eatAudioFile = eatAudio[Math.floor(Math.random() * eatAudio.length)];
+      const audio = new Audio(eatAudioFile); // Use the selected file path
+      audio.currentTime = 0;
+      audio.play();
+      gameIsOver();
+    }
+    
   };
   
   const isOutOfBoard = () => {
@@ -225,7 +279,7 @@ const Board = () => {
   };
 
   const gameLoop = (time, deltaTime, frame) => {
-    if (gameOver) {
+    if (gameOver || hasWon) {
       gsap.ticker.remove(gameLoop); // Stop the game loop if game is over
       return;
     }
@@ -240,17 +294,23 @@ const Board = () => {
       cantChangeDirection.current = true;
     }
   
-    if (foodTimer.current > 0.1 && foodData.length < 100) {
+    if (foodTimer.current > 3 && foodData.length < 10) {
       foodTimer.current = 0;
       addItem({ getter: foodData, setter: setFoodData });
     }
   
-    if (trapTimer.current > 2 && trapData.length < 15) {
+    if (trapTimer.current > 5 && trapData.length < 10) {
       trapTimer.current = 0;
       addItem({ getter: trapData, setter: setTrapData });
     }
   };
   
+  const winGame = () => {
+    console.log("YOU WIN!");
+    gsap.ticker.remove(gameLoop); 
+    setHasWon(true); 
+  };
+
 
   useEffect(() => {
     window.addEventListener("keydown", onKeyDown);
@@ -263,20 +323,7 @@ const Board = () => {
     };
   }, [snakeData]);
 
-  const walls = [
-    { x: 125, y: 150 }, { x: 125, y: 175 }, { x: 125, y: 200 }, { x: 125, y: 225 }, { x: 125, y: 250 },
-    { x: 125, y: 275 }, { x: 125, y: 300 }, { x: 125, y: 325 }, { x: 125, y: 350 }, { x: 125, y: 375 },
-    { x: 125, y: 400 }, { x: 125, y: 425 }, { x: 125, y: 450 }, { x: 150, y: 150 }, { x: 175, y: 150 },
-    { x: 200, y: 150 }, { x: 225, y: 150 }, { x: 250, y: 150 }, { x: 275, y: 150 }, { x: 300, y: 150 },
-    { x: 275, y: 150 }, { x: 525, y: 150 }, { x: 525, y: 175 }, { x: 525, y: 200 }, { x: 525, y: 225 },
-    { x: 525, y: 250 }, { x: 525, y: 275 }, { x: 525, y: 300 },
-    { x: 550, y: 300 }, { x: 575, y: 300 }, { x: 600, y: 300 }, { x: 625, y: 300 }, { x: 650, y: 300 },
-    { x: 675, y: 300 }, { x: 700, y: 300 }, { x: 725, y: 300 }, { x: 750, y: 300 }, { x: 775, y: 300 },
-    { x: 800, y: 300 }, { x: 825, y: 300 },
-    { x: 575, y: 325 }, { x: 575, y: 350 }, { x: 575, y: 375 }, { x: 575, y: 400 }, { x: 575, y: 425 },
-    { x: 375, y: 500 }, { x: 375, y: 475 }, { x: 375, y: 450 }, { x: 375, y: 425 } 
-  ];
-  
+ 
 
   return (
     <>
@@ -284,7 +331,7 @@ const Board = () => {
         <div className={s.board}>
           {/* <img src="/back.jpg" alt="" /> */}
 
-          <span className={s.score}> Score : {score}</span>
+          <span className={s.score}> {score}/ 30 students </span>
           <Snake data={snakeData} segmentRotations={segmentRotations}></Snake>
           {foodData.map((food) => {
             // console.log('Food DDDDDDDDDDDDDD:', food);
@@ -296,20 +343,13 @@ const Board = () => {
             return <Item key={trap.id} coordonates={trap} type='trap'></Item>;
           })}
 
-
-          {walls.map((wall, index) => { return ( <div key={index} className={s.wall} style={{ transform: `translate(${wall.x}px, ${wall.y}px)` }}></div> ); })}
         </div>
 
        
       </div>
 
-      <div className={s.mapWrapper}>
-          <div className={`${s.map} ${s['map-left']}`}>
-          <img src=" /map-left.jpg" alt="" /></div>
-          <div className={`${s.map} ${s['map-right']}`}>
-          <img src=" /map-right.jpg" alt="" /></div>
-      </div>
-
+     
+      {hasWon && <Win replay={replay} />}
       {gameOver && <GameOver replay={replay}></GameOver>}
     </>
   );

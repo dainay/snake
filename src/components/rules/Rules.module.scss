@@ -1,0 +1,67 @@
+ 
+  
+.rules {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 10;
+  }
+  .wrapper {
+    background-image: url('../../../public/paper.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
+ 
+    width: 800px;
+    width: 800px;  
+    color: rgb(19, 19, 19);
+    font-family: "La Belle Aurore", serif;
+    font-weight: 400;
+    padding: 100px;
+    position: relative;
+ 
+  }
+  .nogood {
+    width: 300px;
+    margin-bottom: -20px;
+    -webkit-transform: translateX();
+    -moz-transform: translateX();
+    -ms-transform: translateX();
+    -o-transform: translateX();
+    width: 40%;
+    cursor: pointer;
+
+    &:hover {
+      transform: scale(1.05);
+      -webkit-transform: scale(1.05);
+      -moz-transform: scale(1.05);
+      -ms-transform: scale(1.05);
+      -o-transform: scale(1.05);
+      filter: drop-shadow(0 0 2px rgba(22, 22, 22, 0.5));
+      -webkit-filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}
+}
+  
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  p {
+    font-size: 1.2rem;
+    line-height: 1.5;
+    margin-bottom: 30px;
+  }
+  
+
+
+ 
