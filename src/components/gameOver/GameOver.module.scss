@@ -1,6 +1,6 @@
 .gameOver {
-    background-color: black;
-    opacity: 0.8;
+    background-color: rgba(0, 0, 0, 0.726);
+   
     width: 100vw;
     height: 100vh;
     z-index: 100;
@@ -17,3 +17,31 @@
 .replay {
     display: block;
 }
+
+.content {
+    &::before {
+        content: '';
+        background-image: url('../../../public/paper.png');
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 100% 100%;
+        opacity: 0.8; 
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+ 
+    width: 800px;
+    width: 800px;  
+    color: rgb(19, 19, 19);
+    font-family: "La Belle Aurore", serif;
+    font-weight: 400;
+    padding: 100px;
+    position: relative;
+    transition: all 2s linear;
+    opacity: 1;
+ 
+  }

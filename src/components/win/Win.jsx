@@ -21,7 +21,7 @@ const Win = ({ replay }) => {
               George Weasley
             </blockquote>
             <button onClick={replay}>We need more DA members!</button>
-            <a className={s.link} href="dariaiarovaia.greatsite.net">Who are you?</a>
+            <a className={s.link} href="https://dariaiarovaia.great-site.net/">Who are you?</a>
                   </div>
         </div>
     </div>

@@ -35,7 +35,7 @@ const Board = () => {
   const direction = useRef("RIGHT");
   const cantChangeDirection = useRef(true);
   const [gameOver, setGameOver] = useState(false);
-  const [speed, setSpeed] = useState(0.7);
+  const [speed, setSpeed] = useState(0.5);
   const [score, setScore] = useState(1);
   const [hasWon, setHasWon] = useState(false);
   const walls = useGameStore.getState().walls; // Get the walls from the Zustand store
@@ -90,7 +90,7 @@ const Board = () => {
     timer.current = 0;
     foodTimer.current = 0;
     trapTimer.current = 0;
-    setSpeed(0.7);
+    setSpeed(0.5);
     setScore(1);
     removeMode("impossible");
     removeMode("corner");
@@ -219,7 +219,7 @@ const Board = () => {
       newSegmentRotations.shift();
     }
 
-   if (score >= 35) {
+   if (score >= 30) {
       winGame();
       return; // Exit the function to stop further logic
     }
@@ -299,7 +299,7 @@ const Board = () => {
       addItem({ getter: foodData, setter: setFoodData });
     }
   
-    if (trapTimer.current > 5 && trapData.length < 10) {
+    if (trapTimer.current > 8 && trapData.length < 7) {
       trapTimer.current = 0;
       addItem({ getter: trapData, setter: setTrapData });
     }

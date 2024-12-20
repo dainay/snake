@@ -6,10 +6,32 @@
     // border: 1px solid white;
 
     &_trap {
-        background-color: rgb(204, 31, 161);
+        // background-color: rgb(204, 31, 161);
+        svg path {
+            fill: rgb(182, 93, 34);
+        }
     }
 
     &_food {
-        // background-color: green;
+        svg path {
+            fill: rgb(44, 42, 128);
+        }
+    }
+}
+
+.prof {
+    position: absolute;
+    width: 56px;
+    top: -23px;
+    right: -19px; 
+    
+    span {
+        font-family: "La Belle Aurore", serif;
+        position: absolute;
+        left: 13px;
+    }
+
+    img {
+        width: 100%;
     }
 }

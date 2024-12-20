@@ -15,7 +15,10 @@ body {
   position: fixed;
   top: 20px;
   left: 20px;
-  z-index: 1000;
+  background-image: url("../public/paper.png");
+  background-position: center;
+  background-size: cover;
+padding: 20px;
   
 }
 
@@ -49,4 +52,10 @@ body {
   left: 50%;
   bottom: 20px;
   
+}
+
+.bolder {
+  // font-family: "Mr Dafoe", serif;
+  color: black;
+  font-weight: bolder;
 }
